@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Feedback</title>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg,#1e1e2f,#2f2f55);
+      color: white;
+      text-align: center;
+      padding-top: 40px;
+    }
+
+    .container {
+      width: 420px;
+      margin: auto;
+      background: #2a2a40;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .stars span {
+      font-size: 28px;
+      cursor: pointer;
+      color: gray;
+      transition: 0.2s;
+    }
+
+    .stars span:hover {
+      transform: scale(1.2);
+    }
+
+    .active {
+      color: gold;
+    }
+
+    textarea, select {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+
+    label {
+      margin: 0 10px;
+    }
+
+    button {
+      padding: 12px;
+      width: 100%;
+      background: #fc8019;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 15px;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #e56f12;
+    }
+
+    .success {
+      display: none;
+      font-size: 18px;
+      color: #4CAF50;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container" id="formBox">
+
+  <h2>Feedback Survey</h2>
+
+  <!-- Q1 -->
+  <p>1. Rate Food Quality</p>
+  <div class="stars" id="q1"></div>
+
+  <!-- Q2 -->
+  <p>2. Rate Delivery Speed</p>
+  <div class="stars" id="q2"></div>
+
+  <!-- Q3 -->
+  <p>3. App Experience</p>
+  <select id="q3">
+    <option value="">Select</option>
+    <option>Excellent</option>
+    <option>Good</option>
+    <option>Average</option>
+    <option>Poor</option>
+  </select>
+
+  <!-- Q4 -->
+  <p>4. Would you recommend us?</p>
+  <label><input type="radio" name="q4" value="Yes"> Yes</label>
+  <label><input type="radio" name="q4" value="No"> No</label>
+
+  <!-- Q5 -->
+  <p>5. Any Suggestions?</p>
+  <textarea id="q5" placeholder="Write your feedback..."></textarea>
+
+  <button onclick="submitFeedback()">Submit Feedback</button>
+
+  <div class="success" id="successMsg">
+    ✅ Feedback submitted successfully! Redirecting...
+  </div>
+
+</div>
+
+<script>
+let answers = { q1: 0, q2: 0 };
+
+/* CREATE STARS */
+function createStars(id) {
+  let container = document.getElementById(id);
+
+  for (let i = 1; i <= 5; i++) {
+    let star = document.createElement("span");
+    star.innerHTML = "★";
+
+    star.onmouseover = () => updateStars(id, i);
+    star.onclick = () => {
+      answers[id] = i;
+    };
+
+    container.appendChild(star);
+  }
+}
+
+/* UPDATE STAR COLOR */
+function updateStars(id, value) {
+  let stars = document.getElementById(id).children;
+  for (let i = 0; i < stars.length; i++) {
+    stars[i].classList.toggle("active", i < value);
+  }
+}
+
+/* INIT */
+createStars("q1");
+createStars("q2");
+
+/* SUBMIT */
+function submitFeedback() {
+
+  let q3 = document.getElementById("q3").value;
+  let q4 = document.querySelector('input[name="q4"]:checked');
+  let q5 = document.getElementById("q5").value.trim();
+
+  if (!answers.q1 || !answers.q2 || !q3 || !q4 || !q5) {
+    alert("⚠ Please complete all fields!");
+    return;
+  }
+
+  let feedback = {
+    foodQuality: answers.q1,
+    deliverySpeed: answers.q2,
+    appExperience: q3,
+    recommend: q4.value,
+    suggestions: q5,
+    date: new Date().toLocaleString()
+  };
+
+  let stored = JSON.parse(localStorage.getItem("feedback")) || [];
+  stored.push(feedback);
+  localStorage.setItem("feedback", JSON.stringify(stored));
+
+  // Show success UI
+  document.getElementById("successMsg").style.display = "block";
+
+  // Redirect after 2 sec
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 2000);
+}
+</script>
+
+</body>
+</html>
